@@ -10,6 +10,8 @@ Opis projektu: Model ewaluacji pracowników - ocena okresowa
             Wyjście:
                     Ocena okresowa Pracownika w skali 1-5
 
+Korzystając z systemu upewnijmy się, że mamy zainstalowaną biblitekę numpy skfuzzy
+
 """
 
 import numpy as np
@@ -45,26 +47,28 @@ grade = ctrl.Consequent(np.arange(0, 5, 1), 'grade')
 
 efficiency_axis.automf(3)
 qualifications_axis.automf(3)
-desire_to_develop_axis.automf(5)
+desire_to_develop_axis.automf(3)
 
 grade_names = ['slaby', 'przecietny', 'sredni', 'przyzwoity', 'dobry']
 grade.automf(names=grade_names)
 
-# rules
+# rules1
 
 rule1 = ctrl.Rule(antecedent=((efficiency_axis['poor'] & qualifications_axis['poor'] & desire_to_develop_axis['poor']) |
                               (efficiency_axis['poor'] & qualifications_axis['average'] & desire_to_develop_axis['poor']) |
                               (efficiency_axis['average'] & qualifications_axis['poor'] & desire_to_develop_axis['poor'])),
                   consequent=(grade['slaby']))
 
-rule2 = ctrl.Rule(antecedent=(efficiency_axis['average'] & qualifications_axis['poor'] & desire_to_develop_axis['average']),
+rule2 = ctrl.Rule(antecedent=((efficiency_axis['average'] & qualifications_axis['poor'] & desire_to_develop_axis['average']) |
+                              (efficiency_axis['average'] & qualifications_axis['good'] & desire_to_develop_axis['poor'])),
                   consequent=(grade['przecietny']))
 
 rule3 = ctrl.Rule(antecedent=(efficiency_axis['average'] & qualifications_axis['average'] & desire_to_develop_axis['average']),
                   consequent=(grade['sredni']))
 
 rule4 = ctrl.Rule(antecedent=((efficiency_axis['average'] & qualifications_axis['good'] & desire_to_develop_axis['average']) |
-                              (efficiency_axis['good'] & qualifications_axis['average'] & desire_to_develop_axis['average'])),
+                              (efficiency_axis['good'] & qualifications_axis['average'] & desire_to_develop_axis['average']) |
+                              (efficiency_axis['average'] & qualifications_axis['average'] & desire_to_develop_axis['good'])),
                   consequent=(grade['przyzwoity']))
 
 rule5 = ctrl.Rule(antecedent=((efficiency_axis['good'] & qualifications_axis['good'] & desire_to_develop_axis['good']) |
@@ -86,6 +90,6 @@ employee_grade.input['desire_to_develop'] = desire_to_develop
 
 employee_grade.compute()
 
-print(employee_grade.output['grade'])
+print('Średnia pracownika to: ' + str(round(employee_grade.output['grade'], 2)))
 
 grade.view(sim=employee_grade)
