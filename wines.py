@@ -46,7 +46,9 @@ class SvmWines:
         X = array[:, 0:11]
         y = array[:, 11]
         # preprocesing data and training
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4)
+        self.svmclassifier.fit(X, y)
+        # training
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
         self.svmclassifier.fit(X_train, y_train)
 
     def getResult(self, random_wine):
